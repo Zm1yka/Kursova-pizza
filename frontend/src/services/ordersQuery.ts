@@ -29,7 +29,6 @@ export type OrderDoc = {
 }
 
 export async function fetchOrdersByUser(userId: string): Promise<OrderDoc[]> {
-  // Уникаємо необхідності композитного індексу, отримуючи та сортируючи на клієнті.
   const q = query(collection(db, 'orders'), where('userId', '==', userId))
   const snap = await getDocs(q)
   const orders = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<OrderDoc, 'id'>) }))
@@ -41,9 +40,6 @@ export async function fetchOrdersByUser(userId: string): Promise<OrderDoc[]> {
   return orders
 }
 
-/**
- * Отримання одного замовлення за id з Firestore `orders/{id}`.
- */
 export async function fetchOrderById(orderId: string): Promise<OrderDoc | null> {
   const snap = await getDoc(doc(db, 'orders', orderId))
   if (!snap.exists()) return null

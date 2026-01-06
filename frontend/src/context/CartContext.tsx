@@ -106,28 +106,17 @@ function safeParseCart(raw: string | null): CartItem[] {
   try {
     const parsed = JSON.parse(raw) as unknown
     if (!Array.isArray(parsed)) return []
-    // Зберігаємо дозвільний підхід; PizzaCard/UI відобразить те, що збережено.
     return parsed as CartItem[]
   } catch {
     return []
   }
 }
 
-/**
- * Провайдер кошика покупок, що використовує Context API + useReducer.
- * Підтримує додавання/видалення/оновлення кількості + розрахунок загальної суми.
- *
- * Збереження даних:
- * - Гості: localStorage
- * - Авторизовані користувачі: документ Firestore `carts/{uid}`
- */
 export function CartProvider({ children }: PropsWithChildren) {
   const { user } = useAuth()
   const [hydrated, setHydrated] = useState(false)
   const [state, dispatch] = useReducer(cartReducer, { items: [] })
 
-  // Завантаження кошика зі сховища (Firestore для авторизованих, localStorage для гостей)
-  // Також оновлення даних піц/напоїв для отримання актуальних цін та знижок
   useEffect(() => {
     let alive = true
 
@@ -144,7 +133,6 @@ export function CartProvider({ children }: PropsWithChildren) {
 
         if (!alive) return
 
-        // Оновлення даних піц та напоїв з Firestore для отримання актуальних цін та знижок
         const refreshedItems: CartItem[] = await Promise.all(
           items.map(async (item) => {
             if (item.pizza) {
@@ -184,33 +172,28 @@ export function CartProvider({ children }: PropsWithChildren) {
     }
   }, [user?.uid])
 
-  // Збереження кошика при кожній зміні (після початкового завантаження)
   useEffect(() => {
     if (!hydrated) return
 
-    // гість -> localStorage
     if (!user) {
       localStorage.setItem(LS_KEY, JSON.stringify(state.items))
       return
     }
 
-    // авторизований -> Firestore
     const timeout = setTimeout(() => {
       void setDoc(
         doc(db, 'carts', user.uid),
         { items: state.items, updatedAt: serverTimestamp() },
         { merge: true },
       )
-    }, 250) // Затримка 250мс для debounce
+    }, 250)
 
     return () => clearTimeout(timeout)
   }, [hydrated, user?.uid, state.items])
 
   const totalItems = useMemo(() => state.items.reduce((sum, i) => sum + i.quantity, 0), [state.items])
   
-  // Розрахунок загальної суми зі знижкою "2-га піца -15%" (тільки для піц, не для напоїв)
   const totalAmount = useMemo(() => {
-    // Допоміжна функція для отримання актуальної ціни піци з discountPercent
     const getPizzaPrice = (pizza: Pizza): number => {
       if (pizza.discountPercent) {
         return (pizza.price * (100 - pizza.discountPercent)) / 100
@@ -218,13 +201,12 @@ export function CartProvider({ children }: PropsWithChildren) {
       return pizza.price
     }
 
-    // Розділення піц та напоїв
     const allPizzas: Array<{ basePrice: number; toppingsPrice: number }> = []
     const allDrinks: Array<{ price: number }> = []
     
     for (const item of state.items) {
       if (item.pizza) {
-        const basePrice = getPizzaPrice(item.pizza) // Використовуємо ціну зі знижкою
+        const basePrice = getPizzaPrice(item.pizza)
         const toppingsPrice = toppingsSum(item.toppings)
         for (let i = 0; i < item.quantity; i++) {
           allPizzas.push({ basePrice, toppingsPrice })
@@ -236,20 +218,17 @@ export function CartProvider({ children }: PropsWithChildren) {
       }
     }
 
-    // Застосування знижки 15% до кожної 2-ї піци (індекс 1, 3, 5, ...)
     let total = 0
     for (let i = 0; i < allPizzas.length; i++) {
       const { basePrice, toppingsPrice } = allPizzas[i]
       const unitPrice = basePrice + toppingsPrice
       if (i % 2 === 1) {
-        // 2-га, 4-та, 6-та і т.д. піца отримує знижку 15%
         total += unitPrice * 0.85
       } else {
         total += unitPrice
       }
     }
     
-    // Додавання напоїв (без знижки)
     for (const drink of allDrinks) {
       total += drink.price
     }

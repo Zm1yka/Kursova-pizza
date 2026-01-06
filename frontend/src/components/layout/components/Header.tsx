@@ -30,7 +30,6 @@ export function Header() {
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const burgerButtonRef = useRef<HTMLButtonElement>(null)
 
-  // Закриття мобільного меню при кліку поза ним
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (

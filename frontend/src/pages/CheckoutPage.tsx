@@ -17,22 +17,19 @@ function formatCardNumber(value: string): string {
   for (let i = 0; i < digits.length; i += 4) {
     groups.push(digits.slice(i, i + 4))
   }
-  return groups.join(' ').slice(0, 19) // Максимум 16 цифр + 3 пробіли
+  return groups.join(' ').slice(0, 19)
 }
 
 function formatCardExp(value: string): string {
   const digits = value.replace(/\D/g, '')
   if (digits.length === 0) return ''
   if (digits.length <= 2) return digits
-  // Обмежуємо до 4 цифр і додаємо "/" після перших двох
   const limited = digits.slice(0, 4)
   return `${limited.slice(0, 2)}/${limited.slice(2, 4)}`
 }
 
 function formatPhone(value: string): string {
-  // Видаляємо все крім цифр
   const digits = value.replace(/\D/g, '')
-  // Обмежуємо до 12 цифр (для українських номерів: +380XXXXXXXXX)
   const limited = digits.slice(0, 12)
   
   if (limited.length === 0) return ''
@@ -87,7 +84,6 @@ export function CheckoutPage() {
   const canSubmit = useMemo(() => {
     if (!user) return false
     if (!items.length) return false
-    // Перевіряємо телефон: має бути мінімум 10 цифр (без +380)
     const phoneDigits = phone.replace(/\D/g, '')
     if (!phone.trim() || phoneDigits.length < 10) return false
     if (!address.trim()) return false
@@ -139,7 +135,7 @@ export function CheckoutPage() {
               }}
               required
               inputMode="tel"
-              maxLength={17} // +380 XX XXX XX XX = 17 символів
+              maxLength={17}
             />
           </div>
           <Input
@@ -209,7 +205,6 @@ export function CheckoutPage() {
                     label="Термін (MM/YY)"
                     value={cardExp}
                     onChange={(e) => {
-                      // Видаляємо все крім цифр перед форматуванням
                       const digitsOnly = e.target.value.replace(/\D/g, '')
                       const formatted = formatCardExp(digitsOnly)
                       setCardExp(formatted)
@@ -222,7 +217,7 @@ export function CheckoutPage() {
                     }}
                     placeholder="12/29"
                     inputMode="numeric"
-                    maxLength={5} // MM/YY = 5 символів
+                    maxLength={5}
                   />
                   {cardExpError ? (
                     <div className="mt-1 text-xs text-red-600">{cardExpError}</div>
@@ -232,7 +227,6 @@ export function CheckoutPage() {
                   label="CVC"
                   value={cardCvc}
                   onChange={(e) => {
-                    // Дозволяємо тільки цифри, максимум 3
                     const digits = e.target.value.replace(/\D/g, '').slice(0, 3)
                     setCardCvc(digits)
                   }}
@@ -292,7 +286,7 @@ export function CheckoutPage() {
                   totalAmount,
                   delivery: {
                     name: user.name,
-                    phone: phone.replace(/\D/g, ''), // Зберігаємо тільки цифри
+                    phone: phone.replace(/\D/g, ''),
                     address: address.trim(),
                     ...(comment.trim() ? { comment: comment.trim() } : {}),
                   },

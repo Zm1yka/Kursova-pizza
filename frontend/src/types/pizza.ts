@@ -7,7 +7,7 @@ export type Pizza = {
   price: number
   imageUrl: string
   category: PizzaCategory
-  discountPercent?: number // Опціональний відсоток знижки (наприклад, 20 для знижки 20%)
+  discountPercent?: number
 }
 
 

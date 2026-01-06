@@ -8,9 +8,6 @@ type UseDrinksState = {
   error: string | null
 }
 
-/**
- * Кастомний hook для отримання напоїв з Firestore.
- */
 export function useDrinks(): UseDrinksState {
   const [drinks, setDrinks] = useState<Drink[]>([])
   const [loading, setLoading] = useState(true)

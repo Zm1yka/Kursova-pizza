@@ -3,9 +3,6 @@ import type { Drink } from '../../types/drink'
 import { useCart } from '../../hooks/useCart'
 import { PizzaImage } from '../pizza/PizzaImage'
 
-/**
- * Переіспользуваний компонент картки напою.
- */
 export function DrinkCard({ drink }: { drink: Drink }) {
   const { addDrink } = useCart()
 

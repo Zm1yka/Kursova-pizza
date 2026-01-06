@@ -8,9 +8,6 @@ type UsePizzasState = {
   error: string | null
 }
 
-/**
- * React hook для завантаження піц з Firestore.
- */
 export function usePizzas(): UsePizzasState {
   const [state, setState] = useState<UsePizzasState>({ pizzas: [], loading: true, error: null })
 

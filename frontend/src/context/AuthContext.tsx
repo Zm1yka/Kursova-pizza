@@ -30,13 +30,6 @@ type AuthContextValue = {
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
-/**
- * Провайдер автентифікації на основі Firebase Authentication.
- *
- * - Спостерігає за станом автентифікації через onAuthStateChanged
- * - Підтримує вхід та реєстрацію через email/password
- * - Підтримує вхід через Google акаунт через popup
- */
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)

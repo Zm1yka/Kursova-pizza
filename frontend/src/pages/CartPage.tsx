@@ -89,7 +89,6 @@ export function CartPage() {
                 </div>
 
                 <div className="flex items-center justify-between sm:justify-end gap-3">
-                  {/* Ціна за одиницю включає вибрані інгредієнти для піц */}
                   <div className="font-semibold whitespace-nowrap text-slate-900">
                     {it.pizza
                       ? (() => {
@@ -116,7 +115,6 @@ export function CartPage() {
           <aside className="rounded-2xl border border-slate-200 bg-white p-4 h-fit shadow-sm">
             <div className="font-semibold text-slate-900">Підсумок</div>
             {(() => {
-              // Розрахунок проміжної суми зі знижками на піци, але без знижки "2-га піца -15%"
               const subtotal = items.reduce((sum, i) => {
                 if (i.pizza) {
                   const pizzaPrice = i.pizza.discountPercent

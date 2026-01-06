@@ -3,10 +3,6 @@ import { GoogleAuthProvider, getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 
-/**
- * Ініціалізація Firebase.
- * ПРИМІТКА: Для університетського проекту це нормально в коді, але для продакшену краще використовувати змінні середовища Vite (VITE_*).
- */
 const firebaseConfig = {
   apiKey: 'AIzaSyDY07AdC0QxQuYqvAK0DGIag09dtpyozC4',
   authDomain: 'webkursova-65b9c.firebaseapp.com',

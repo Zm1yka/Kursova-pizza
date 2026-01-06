@@ -13,10 +13,6 @@ const categoryLabel: Record<PizzaCategory, string> = {
   Spicy: 'Гострі',
 }
 
-/**
- * Сторінка меню з клієнтською фільтрацією (категорія) та сортуванням (ціна).
- * Складність: фільтрація/сортування мають O(n) та O(n log n) на клієнтському списку відповідно.
- */
 export function MenuPage() {
   const { pizzas: allPizzas, loading, error } = usePizzas()
   const { drinks, loading: drinksLoading, error: drinksError } = useDrinks()

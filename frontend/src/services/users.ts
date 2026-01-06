@@ -15,10 +15,6 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   }
 }
 
-/**
- * Перевірка існування документа користувача в `users/{uid}`.
- * Не перезаписує існуюче ім'я, якщо воно вже встановлено.
- */
 export async function ensureUserProfile(input: { uid: string; email: string | null; name?: string | null }) {
   const ref = doc(db, 'users', input.uid)
   const snap = await getDoc(ref)

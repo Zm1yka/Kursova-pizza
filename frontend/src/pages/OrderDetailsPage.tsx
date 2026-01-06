@@ -69,7 +69,6 @@ export function OrderDetailsPage() {
           setError('Замовлення не знайдено')
           return
         }
-        // Перевірка, що замовлення належить поточному користувачу
         if (user && data.userId !== user.uid) {
           setError('Немає доступу до цього замовлення')
           return
@@ -138,7 +137,6 @@ export function OrderDetailsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
         <div className="space-y-6">
-          {/* Статус та дата */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
@@ -156,7 +154,6 @@ export function OrderDetailsPage() {
             </div>
           </div>
 
-          {/* Товари */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Що замовив клієнт</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -200,7 +197,6 @@ export function OrderDetailsPage() {
             </div>
           </div>
 
-          {/* Доставка */}
           {order.delivery ? (
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Доставка</h2>
@@ -227,7 +223,6 @@ export function OrderDetailsPage() {
             </div>
           ) : null}
 
-          {/* Оплата */}
           {order.payment ? (
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Оплата</h2>
@@ -249,7 +244,6 @@ export function OrderDetailsPage() {
           ) : null}
         </div>
 
-        {/* Підсумок */}
         <aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm h-fit">
           <div className="font-semibold text-slate-900 mb-4">Підсумок</div>
           <div className="space-y-3">

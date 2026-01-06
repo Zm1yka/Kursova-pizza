@@ -6,10 +6,6 @@ function isPizzaCategory(value: unknown): value is PizzaCategory {
   return value === 'Meat' || value === 'Veggie' || value === 'Spicy'
 }
 
-/**
- * Отримання піц з колекції Firestore `pizzas`.
- * Документи повинні містити: title, description, price, imageUrl, category.
- */
 export async function fetchPizzas(): Promise<Pizza[]> {
   const snap = await getDocs(collection(db, 'pizzas'))
   return snap.docs.map((d) => {
@@ -27,9 +23,6 @@ export async function fetchPizzas(): Promise<Pizza[]> {
   })
 }
 
-/**
- * Отримання однієї піци за id з Firestore `pizzas/{id}`.
- */
 export async function fetchPizzaById(id: string): Promise<Pizza | null> {
   const snap = await getDoc(doc(db, 'pizzas', id))
   if (!snap.exists()) return null

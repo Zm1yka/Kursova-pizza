@@ -10,9 +10,6 @@ const categoryLabel: Record<Pizza['category'], string> = {
   Spicy: 'Гостра',
 }
 
-/**
- * Переіспользуваний компонент картки піци, використовується в каталозі та рекомендованих розділах.
- */
 export function PizzaCard({ pizza }: { pizza: Pizza }) {
   const { addItem } = useCart()
   return (

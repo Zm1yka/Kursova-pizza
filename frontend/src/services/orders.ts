@@ -19,10 +19,6 @@ export type CreateOrderInput = {
   }
 }
 
-/**
- * Створення документа замовлення в колекції Firestore `orders`.
- * Схема: { userId, items, totalAmount, timestamp }
- */
 export async function createOrder({
   userId,
   items,
@@ -31,7 +27,6 @@ export async function createOrder({
   payment,
   status = 'new',
 }: CreateOrderInput) {
-  // Очищаємо undefined значення, замінюємо на null або видаляємо поле
   const cleanDelivery = delivery
     ? {
         name: delivery.name,
@@ -41,7 +36,6 @@ export async function createOrder({
       }
     : null
 
-  // Очищаємо payment об'єкт від undefined значень
   const cleanPayment = payment
     ? {
         method: payment.method,
@@ -58,7 +52,6 @@ export async function createOrder({
     payment: cleanPayment,
     items: items.map((i) => {
       if (i.pizza) {
-        // Розрахунок ціни зі знижкою, якщо застосовується
         const pizzaPrice = i.pizza.discountPercent
           ? (i.pizza.price * (100 - i.pizza.discountPercent)) / 100
           : i.pizza.price
@@ -67,7 +60,7 @@ export async function createOrder({
           type: 'pizza' as const,
           pizzaId: i.pizza.id,
           title: i.pizza.title,
-          price: pizzaPrice, // Зберігаємо ціну зі знижкою
+          price: pizzaPrice,
           quantity: i.quantity,
           imageUrl: i.pizza.imageUrl,
           category: i.pizza.category,

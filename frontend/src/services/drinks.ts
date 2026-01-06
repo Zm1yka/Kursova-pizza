@@ -2,9 +2,6 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase/firebase'
 import type { Drink } from '../types/drink'
 
-/**
- * Отримання напоїв з колекції Firestore `drinks`.
- */
 export async function fetchDrinks(): Promise<Drink[]> {
   const snap = await getDocs(collection(db, 'drinks'))
   return snap.docs.map((d) => {

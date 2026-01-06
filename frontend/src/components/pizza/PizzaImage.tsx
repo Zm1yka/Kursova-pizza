@@ -6,12 +6,6 @@ type Props = {
   className?: string
 }
 
-/**
- * Відображення зображення піци.
- * Підтримує:
- * - http(s) URL
- * - Локальні шляхи, що починаються з / (обслуговуються Vite з папки public)
- */
 export function PizzaImage({ imageUrl, alt, className }: Props) {
   const [src, setSrc] = useState<string | null>(null)
 
@@ -23,14 +17,11 @@ export function PizzaImage({ imageUrl, alt, className }: Props) {
         if (alive) setSrc(null)
         return
       }
-      // HTTP/HTTPS URL адреси
       if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
         if (alive) setSrc(imageUrl)
         return
       }
-      // Локальні шляхи, що починаються з / (з папки public)
       if (imageUrl.startsWith('/')) {
-        // Кодуємо тільки ім'я файлу для обробки кириличних символів
         const pathParts = imageUrl.split('/')
         const filename = pathParts.pop()
         const dir = pathParts.join('/')
@@ -38,10 +29,8 @@ export function PizzaImage({ imageUrl, alt, className }: Props) {
         if (alive) setSrc(encodedPath)
         return
       }
-      // Шляхи, що починаються з tmp/ - конвертуємо в /tmp/
       if (imageUrl.startsWith('tmp/')) {
         const fullPath = `/${imageUrl}`
-        // Кодуємо тільки ім'я файлу для обробки кириличних символів
         const pathParts = fullPath.split('/')
         const filename = pathParts.pop()
         const dir = pathParts.join('/')

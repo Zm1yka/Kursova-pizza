@@ -1,13 +1,32 @@
 # Backend - VULCANO Pizzeria
 
-Backend частина проекту для роботи з Firebase.
+Backend частина проекту - Express сервер для обслуговування React додатку та роботи з Firebase.
 
 ## Що тут є?
 
+- **`server.js`** - Express сервер для обслуговування статичних файлів та API endpoints
 - **`scripts/seed-firestore.mjs`** - скрипт для заповнення Firestore початковими даними (піци, напої, інгредієнти)
 - **`firestore.rules`** - правила безпеки для Firestore (хто може читати/писати дані)
 
 ## Як використовувати?
+
+### Запуск сервера
+
+1. **Побудуй frontend:**
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   ```
+
+2. **Запусти backend сервер:**
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
+
+Сервер запуститься на `http://localhost:3000` і обслуговуватиме React додаток.
 
 ### Seed скрипт
 
@@ -44,6 +63,7 @@ Backend частина проекту для роботи з Firebase.
 
 ## Залежності
 
+- `express` - веб-сервер для обслуговування статичних файлів та API
 - `firebase-admin` - для роботи з Firebase Admin SDK (seed скрипт)
 - `jpeg-js` - для обробки зображень
 
