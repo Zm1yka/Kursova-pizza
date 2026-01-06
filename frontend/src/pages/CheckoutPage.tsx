@@ -294,7 +294,7 @@ export function CheckoutPage() {
                     name: user.name,
                     phone: phone.replace(/\D/g, ''), // Зберігаємо тільки цифри
                     address: address.trim(),
-                    comment: comment.trim() || undefined,
+                    ...(comment.trim() ? { comment: comment.trim() } : {}),
                   },
                   payment:
                     paymentMethod === 'card'

@@ -31,13 +31,31 @@ export async function createOrder({
   payment,
   status = 'new',
 }: CreateOrderInput) {
+  // Очищаємо undefined значення, замінюємо на null або видаляємо поле
+  const cleanDelivery = delivery
+    ? {
+        name: delivery.name,
+        phone: delivery.phone,
+        address: delivery.address,
+        ...(delivery.comment ? { comment: delivery.comment } : {}),
+      }
+    : null
+
+  // Очищаємо payment об'єкт від undefined значень
+  const cleanPayment = payment
+    ? {
+        method: payment.method,
+        ...(payment.cardLast4 ? { cardLast4: payment.cardLast4 } : {}),
+      }
+    : null
+
   const payload = {
     userId,
     totalAmount,
     status,
     timestamp: serverTimestamp(),
-    delivery: delivery ?? null,
-    payment: payment ?? null,
+    delivery: cleanDelivery,
+    payment: cleanPayment,
     items: items.map((i) => {
       if (i.pizza) {
         // Розрахунок ціни зі знижкою, якщо застосовується
@@ -64,7 +82,7 @@ export async function createOrder({
           price: i.drink.price,
           quantity: i.quantity,
           imageUrl: i.drink.imageUrl,
-          volume: i.drink.volume,
+          ...(i.drink.volume ? { volume: i.drink.volume } : {}),
         }
       }
       throw new Error('Cart item must have either pizza or drink')
