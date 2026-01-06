@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Small base defaults (keep most styling in Tailwind utility classes) */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
+}
+
+

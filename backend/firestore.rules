@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public catalog: anyone can read pizzas
+    match /pizzas/{pizzaId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Public toppings: anyone can read toppings list
+    match /toppings/{toppingId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Public drinks: anyone can read drinks list
+    match /drinks/{drinkId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // User profiles: only owner can read/write
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // User carts: only owner can read/write
+    match /carts/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Orders: only signed-in users can create; only owner can read
+    match /orders/{orderId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
+
+
