@@ -163,15 +163,19 @@ npm run seed     # Заповнення Firestore даними
 
 ## Деплой
 
-Для деплою потрібна тільки frontend частина. Детальні інструкції з деплою на Render.com дивись в файлі **[DEPLOY.md](./DEPLOY.md)**.
+Проект деплоїться як **Web Service** на Render.com.
 
-**Коротко:**
-1. Створи Static Site на Render.com
-2. Вкажи **Root Directory: `frontend`**
-3. Build Command: `npm install && npm run build`
-4. Publish Directory: `dist`
+**Налаштування на Render:**
+1. Створи **Web Service** (не Static Site)
+2. Підключи репозиторій
+3. Render автоматично використає `render.yaml` з налаштуваннями
 
-Після `npm run build` в папці `frontend/` файли будуть в `frontend/dist/`.
+**Що робить `render.yaml`:**
+- Будує frontend (`cd frontend && npm install && npm run build`)
+- Встановлює backend залежності (`cd ../backend && npm install`)
+- Запускає Express сервер (`cd backend && npm start`)
+
+Сервер обслуговує статичні файли React з `frontend/dist/` та надає API endpoints.
 
 ## Примітки
 
