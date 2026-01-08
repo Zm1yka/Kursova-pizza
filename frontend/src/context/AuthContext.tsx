@@ -44,9 +44,25 @@ export function AuthProvider({ children }: PropsWithChildren) {
           return
         }
 
-        await ensureUserProfile({ uid: u.uid, email: u.email, name: u.displayName })
-        const profile = await getUserProfile(u.uid)
-        const name = profile?.name || u.displayName || (u.email ? u.email.split('@')[0] : 'Користувач')
+        // Спробувати створити/оновити профіль, але не блокувати вхід якщо не вдалося
+        try {
+          await ensureUserProfile({ uid: u.uid, email: u.email, name: u.displayName })
+        } catch (error) {
+          console.warn('Failed to ensure user profile:', error)
+          // Продовжуємо навіть якщо не вдалося створити профіль
+        }
+
+        // Спробувати отримати профіль, але не блокувати якщо не вдалося
+        let name = u.displayName || (u.email ? u.email.split('@')[0] : 'Користувач')
+        try {
+          const profile = await getUserProfile(u.uid)
+          if (profile?.name) {
+            name = profile.name
+          }
+        } catch (error) {
+          console.warn('Failed to get user profile:', error)
+          // Використовуємо displayName або email як fallback
+        }
 
         setUser({ uid: u.uid, email: u.email, name })
       } finally {
@@ -74,11 +90,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setError(null)
         try {
           const cred = await signInWithPopup(auth, googleProvider)
-          await ensureUserProfile({
-            uid: cred.user.uid,
-            email: cred.user.email,
-            name: cred.user.displayName,
-          })
+          // Спробувати створити профіль, але не блокувати вхід якщо не вдалося
+          try {
+            await ensureUserProfile({
+              uid: cred.user.uid,
+              email: cred.user.email,
+              name: cred.user.displayName,
+            })
+          } catch (error) {
+            console.warn('Не вдалося створити профіль після входу через Google:', error)
+            // Продовжуємо навіть якщо не вдалося створити профіль
+          }
         } catch (e) {
           setError(e instanceof Error ? e.message : 'Помилка входу через Google')
           throw e
@@ -89,7 +111,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
         try {
           const cred = await createUserWithEmailAndPassword(auth, email, password)
           await updateProfile(cred.user, { displayName: name })
-          await ensureUserProfile({ uid: cred.user.uid, email: cred.user.email, name })
+          // Спробувати створити профіль, але не блокувати реєстрацію якщо не вдалося
+          try {
+            await ensureUserProfile({ uid: cred.user.uid, email: cred.user.email, name })
+          } catch (error) {
+            console.warn('Не вдалося створити профіль після реєстрації:', error)
+            // Продовжуємо навіть якщо не вдалося створити профіль
+          }
         } catch (e) {
           setError(e instanceof Error ? e.message : 'Помилка реєстрації')
           throw e

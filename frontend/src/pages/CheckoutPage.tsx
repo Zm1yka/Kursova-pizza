@@ -281,7 +281,6 @@ export function CheckoutPage() {
               setSubmitting(true)
               try {
                 await createOrder({
-                  userId: user.uid,
                   items,
                   totalAmount,
                   delivery: {

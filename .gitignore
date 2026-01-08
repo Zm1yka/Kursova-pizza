@@ -68,3 +68,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary migration files
+MIGRATION_TO_BACKEND_API.md

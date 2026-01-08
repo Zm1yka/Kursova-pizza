@@ -3,11 +3,8 @@ import type { PropsWithChildren } from 'react'
 import type { Pizza } from '../types/pizza'
 import type { Topping } from '../types/topping'
 import type { Drink } from '../types/drink'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase/firebase'
 import { useAuth } from '../hooks/useAuth'
-import { fetchPizzaById } from '../services/pizzas'
-import { fetchDrinks } from '../services/drinks'
+import { apiGet, apiPost, apiDelete } from '../services/api'
 
 export type CartItem = {
   key: string
@@ -124,43 +121,19 @@ export function CartProvider({ children }: PropsWithChildren) {
       try {
         let items: CartItem[] = []
         if (user) {
-          const ref = doc(db, 'carts', user.uid)
-          const snap = await getDoc(ref)
-          items = (snap.exists() ? (snap.data().items as CartItem[] | undefined) : undefined) ?? []
+          try {
+            const response = await apiGet('/cart')
+            items = response.items || []
+          } catch (e) {
+            console.warn('Failed to fetch cart from API:', e)
+            items = []
+          }
         } else {
           items = safeParseCart(localStorage.getItem(LS_KEY))
         }
 
         if (!alive) return
-
-        const refreshedItems: CartItem[] = await Promise.all(
-          items.map(async (item) => {
-            if (item.pizza) {
-              try {
-                const freshPizza = await fetchPizzaById(item.pizza.id)
-                if (freshPizza) {
-                  return { ...item, pizza: freshPizza }
-                }
-              } catch (e) {
-                console.warn('Failed to refresh pizza data:', e)
-              }
-            } else if (item.drink) {
-              try {
-                const allDrinks = await fetchDrinks()
-                const freshDrink = allDrinks.find((d) => d.id === item.drink!.id)
-                if (freshDrink) {
-                  return { ...item, drink: freshDrink }
-                }
-              } catch (e) {
-                console.warn('Failed to refresh drink data:', e)
-              }
-            }
-            return item
-          }),
-        )
-
-        if (!alive) return
-        dispatch({ type: 'SET_ITEMS', items: refreshedItems })
+        dispatch({ type: 'SET_ITEMS', items })
       } finally {
         if (alive) setHydrated(true)
       }
@@ -181,11 +154,9 @@ export function CartProvider({ children }: PropsWithChildren) {
     }
 
     const timeout = setTimeout(() => {
-      void setDoc(
-        doc(db, 'carts', user.uid),
-        { items: state.items, updatedAt: serverTimestamp() },
-        { merge: true },
-      )
+      apiPost('/cart', { items: state.items }).catch((e: unknown) => {
+        console.error('Failed to update cart:', e)
+      })
     }, 250)
 
     return () => clearTimeout(timeout)
@@ -245,9 +216,18 @@ export function CartProvider({ children }: PropsWithChildren) {
       addDrink: (drink) => dispatch({ type: 'ADD_DRINK', drink }),
       removeItem: (key) => dispatch({ type: 'REMOVE', key }),
       setQuantity: (key, quantity) => dispatch({ type: 'SET_QTY', key, quantity }),
-      clear: () => dispatch({ type: 'CLEAR' }),
+      clear: async () => {
+        dispatch({ type: 'CLEAR' })
+        if (user) {
+          try {
+            await apiDelete('/cart')
+          } catch (e) {
+            console.error('Failed to clear cart:', e)
+          }
+        }
+      },
     }),
-    [state.items, totalItems, totalAmount],
+    [state.items, totalItems, totalAmount, user],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

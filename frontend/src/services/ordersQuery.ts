@@ -1,5 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
-import { db } from '../firebase/firebase'
+import { apiGet } from './api'
 
 export type OrderDoc = {
   id: string
@@ -28,22 +27,20 @@ export type OrderDoc = {
   }
 }
 
-export async function fetchOrdersByUser(userId: string): Promise<OrderDoc[]> {
-  const q = query(collection(db, 'orders'), where('userId', '==', userId))
-  const snap = await getDocs(q)
-  const orders = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<OrderDoc, 'id'>) }))
-  orders.sort((a, b) => {
-    const ta = (a.timestamp as { toMillis?: () => number } | null | undefined)?.toMillis?.() ?? 0
-    const tb = (b.timestamp as { toMillis?: () => number } | null | undefined)?.toMillis?.() ?? 0
-    return tb - ta
-  })
-  return orders
+export async function fetchOrdersByUser(_userId?: string): Promise<OrderDoc[]> {
+  // userId більше не потрібен, оскільки визначається на backend через токен
+  return await apiGet('/orders')
 }
 
 export async function fetchOrderById(orderId: string): Promise<OrderDoc | null> {
-  const snap = await getDoc(doc(db, 'orders', orderId))
-  if (!snap.exists()) return null
-  return { id: snap.id, ...(snap.data() as Omit<OrderDoc, 'id'>) }
+  try {
+    return await apiGet(`/orders/${orderId}`)
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('404')) {
+      return null
+    }
+    throw error
+  }
 }
 
 

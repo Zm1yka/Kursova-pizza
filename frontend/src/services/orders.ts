@@ -1,9 +1,7 @@
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase/firebase'
+import { apiPost } from './api'
 import type { CartItem } from '../context/CartContext'
 
 export type CreateOrderInput = {
-  userId: string
   items: CartItem[]
   totalAmount: number
   status?: 'new' | 'paid' | 'done' | 'cancelled'
@@ -20,69 +18,20 @@ export type CreateOrderInput = {
 }
 
 export async function createOrder({
-  userId,
   items,
   totalAmount,
   delivery,
   payment,
   status = 'new',
 }: CreateOrderInput) {
-  const cleanDelivery = delivery
-    ? {
-        name: delivery.name,
-        phone: delivery.phone,
-        address: delivery.address,
-        ...(delivery.comment ? { comment: delivery.comment } : {}),
-      }
-    : null
-
-  const cleanPayment = payment
-    ? {
-        method: payment.method,
-        ...(payment.cardLast4 ? { cardLast4: payment.cardLast4 } : {}),
-      }
-    : null
-
-  const payload = {
-    userId,
+  // userId більше не потрібен, оскільки визначається на backend через токен
+  return await apiPost('/orders', {
+    items,
     totalAmount,
+    delivery,
+    payment,
     status,
-    timestamp: serverTimestamp(),
-    delivery: cleanDelivery,
-    payment: cleanPayment,
-    items: items.map((i) => {
-      if (i.pizza) {
-        const pizzaPrice = i.pizza.discountPercent
-          ? (i.pizza.price * (100 - i.pizza.discountPercent)) / 100
-          : i.pizza.price
-        return {
-          key: i.key,
-          type: 'pizza' as const,
-          pizzaId: i.pizza.id,
-          title: i.pizza.title,
-          price: pizzaPrice,
-          quantity: i.quantity,
-          imageUrl: i.pizza.imageUrl,
-          category: i.pizza.category,
-          toppings: i.toppings.map((t) => ({ id: t.id, title: t.title, price: t.price })),
-        }
-      } else if (i.drink) {
-        return {
-          key: i.key,
-          type: 'drink' as const,
-          drinkId: i.drink.id,
-          title: i.drink.title,
-          price: i.drink.price,
-          quantity: i.quantity,
-          imageUrl: i.drink.imageUrl,
-          ...(i.drink.volume ? { volume: i.drink.volume } : {}),
-        }
-      }
-      throw new Error('Cart item must have either pizza or drink')
-    }),
-  }
-
-  return await addDoc(collection(db, 'orders'), payload)
+  })
 }
 
 
